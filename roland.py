@@ -3,7 +3,8 @@ import RPi.GPIO as GPIO
 from utils import clamp
 import wiringpi
 
-# Pinek
+## Pins
+
 # Motor
 IN1 = 20 # left forward
 IN2 = 21 # left back
@@ -72,13 +73,13 @@ def init():
 	# buzzer setup
 	global pwm_BZZ
 	GPIO.setup(BUZZER_PIN, GPIO.OUT)
-	pwm_BZZ = GPIO.PWM(BUZZER_PIN, 50)
+	pwm_BZZ = GPIO.PWM(BUZZER_PIN, 50) // TODO provide correct frequency
 	pwm_BZZ.start(100)
 
 	# servo setup
 	global pwm_SRV
 	GPIO.setup(SERVO_PIN, GPIO.OUT)
-	pwm_SRV = GPIO.PWM(SERVO_PIN, 0, 50)
+	pwm_SRV = GPIO.PWM(SERVO_PIN, 40) // TODO provide correct frequency
 
 	pwm_SRV.start(100)
 	'''
@@ -112,8 +113,11 @@ def led(r: bool, g: bool, b: bool):
 
 # Move the servo into an absolute position
 def servo_absolute(degree: float):
-	degree = clamp(degree, -90, 90)
-	wiringpi.softPwmWrite(SERVO_PIN, (int) (15 - (degree / 9)))
+	degree = (int) (15 - (clamp(degree, -90, 90) / 9))
+	wiringpi.softPwmWrite(SERVO_PIN, degree)
+	'''
+	pwm_SRV.changeDutyCycle(degree)
+	'''
 
 # Return the track sensors' readings
 def track_sensor():
@@ -126,6 +130,9 @@ def track_sensor():
 # Haha robot go brr
 def buzzer(pw: float):
 	wiringpi.softPwmWrite(BUZZER_PIN, pw)
+	'''
+	pwm_BZZ.changeDutyCycle(pw)
+	'''
 
 # Return the ultrasound sensor's reading in centimeters
 def ultra_sensor():
@@ -148,4 +155,10 @@ def ultra_sensor():
 def clean_up():
 	pwm_ENA.stop()
 	pwm_ENB.stop()
+
+	'''
+	pwm_SRV.stop()
+	pwm_BZZ.stop()
+	'''
+
 	GPIO.cleanup()

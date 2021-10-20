@@ -52,6 +52,7 @@ def sensor():
 	emit('return-tracksensor', { 'data':  roland.track_sensor() })
 
 # Get tracksensor info
+# RETURNS: { "data": [0..] }
 @socketio.on('ultrasensor', namespace='/io')
 def sensor():
 	emit('return-ultrasensor', { 'data':  roland.ultra_sensor() })
